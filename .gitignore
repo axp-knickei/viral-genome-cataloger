@@ -40,6 +40,8 @@ venv/
 results/
 output/
 data/
+!tests/data/
+!tests/data/**
 
 # Log files
 *.log
@@ -50,3 +52,5 @@ all_genomes.fa
 skani_results.txt
 ani_formatted.txt
 representative_ids.txt
+!tests/data/ani_formatted.txt
+!tests/data/skani_results.txt

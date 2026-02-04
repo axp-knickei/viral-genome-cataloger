@@ -1,0 +1,2 @@
+genome_a	genome_b	1	96.50	90.00	90.00
+genome_b	genome_c	1	96.00	90.00	90.00
