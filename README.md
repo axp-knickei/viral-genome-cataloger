@@ -1,70 +1,60 @@
 # Viral Genome Cataloging Pipeline
 
-A simple and reproducible pipeline to dereplicate a collection of viral genome sequences and create a non-redundant genome catalog of viral Operational Taxonomic Units (vOTUs).
-
-This workflow uses `skani` for fast and accurate Average Nucleotide Identity (ANI) calculations and a greedy clustering algorithm to group genomes based on a species-level threshold (typically ≥95% ANI).
+A reproducible pipeline to dereplicate a collection of viral genome sequences and create a non-redundant genome catalog of viral Operational Taxonomic Units (vOTUs). The workflow uses `skani` for fast Average Nucleotide Identity (ANI) calculations and a greedy representative (star topology) clustering strategy to define vOTUs.
 
 ---
 
 ## ⚙️ Dependencies
 
-Before you begin, you must have the following command-line tools installed and available in your system's `PATH`.
+The pipeline requires the following command-line tools to be installed and available on your `PATH`:
 
-1.  **Python 3**:
-    * The script is written in Python 3. It uses standard libraries, so no special packages are needed.
+1. **Python 3.9+**
+2. **skani**: For calculating ANI.
+   * Installation (Linux):
+     ```bash
+     wget https://github.com/bluenote-1577/skani/releases/download/latest/skani -O skani
+     chmod +x skani
+     sudo mv skani /usr/local/bin/
+     ```
+3. **SeqKit**: A toolkit for FASTA/Q file manipulation.
+   * Installation (Linux):
+     ```bash
+     wget https://github.com/shenwei356/seqkit/releases/download/v2.8.0/seqkit_linux_amd64.tar.gz
+     tar -xzf seqkit_linux_amd64.tar.gz
+     chmod +x seqkit
+     sudo mv seqkit /usr/local/bin/
+     ```
 
-2.  **skani**: For calculating ANI.
-    * **Installation (Linux):**
-        ```bash
-        wget [https://github.com/bluenote-1577/skani/releases/download/latest/skani](https://github.com/bluenote-1577/skani/releases/download/latest/skani) -O skani
-        chmod +x skani
-        sudo mv skani /usr/local/bin/
-        ```
+---
 
-3.  **SeqKit**: A toolkit for FASTA/Q file manipulation.
-    * **Installation (Linux):**
-        ```bash
-        wget [https://github.com/shenwei356/seqkit/releases/download/v2.8.0/seqkit_linux_amd64.tar.gz](https://github.com/shenwei356/seqkit/releases/download/v2.8.0/seqkit_linux_amd64.tar.gz)
-        tar -xzf seqkit_linux_amd64.tar.gz
-        chmod +x seqkit
-        sudo mv seqkit /usr/local/bin/
-        ```
+## 📦 Installation
+
+Clone the repository and install the package locally:
+
+```bash
+git clone <your-repository-url>
+cd <your-repository-name>
+pip install .
+```
 
 ---
 
 ## 🚀 Usage
 
-1.  **Clone the Repository**
-    ```bash
-    git clone <your-repository-url>
-    cd <your-repository-name>
-    ```
+Prepare a directory of FASTA files (`.fa`, `.fna`, `.fasta`) and run the CLI:
 
-2.  **Prepare Your Input Data**
-    * Create a directory (e.g., `input_genomes`) and place all your individual viral genome FASTA files inside it. The files should have a `.fa`, `.fna`, or `.fasta` extension.
-    ```
-    .
-    ├── create_genome_catalog.py
-    ├── README.md
-    └── input_genomes/
-        ├── virus1.fa
-        ├── virus2.fa
-        └── ...
-    ```
+```bash
+viral-cataloger \
+  -i input_genomes/ \
+  -o results/ \
+  -t 8
+```
 
-3.  **Run the Pipeline**
-    * Execute the script, providing the path to your input directory and a desired output directory.
+You can also invoke the legacy entry point:
 
-    * **Basic Example:**
-        ```bash
-        python create_genome_catalog.py \
-          -i input_genomes/ \
-          -o results/ \
-          -t 8
-        ```
-    * This command will process all genomes in `input_genomes/`, use 8 threads for `skani`, and save all results in a new `results/` directory.
-
----
+```bash
+python create_genome_catalog.py -i input_genomes/ -o results/
+```
 
 ### Command-Line Arguments
 
@@ -75,18 +65,29 @@ Before you begin, you must have the following command-line tools installed and a
 | `--threads` | `-t` | Number of threads to use for `skani`. | `4` |
 | `--min_ani` | | Minimum ANI percentage for clustering. | `95.0` |
 | `--min_tcov` | | Minimum target coverage percentage for clustering. | `85.0` |
-| `--prefix` | | Prefix for the final output files. | `catalog`|
+| `--prefix` | | Prefix for the final output files. | `catalog` |
 
 ---
 
 ## 📁 Output Files
 
-After a successful run, the specified output directory (e.g., `results/`) will contain:
+After a successful run, the output directory (e.g., `results/`) will contain:
 
 * `all_genomes.fa`: A single FASTA file with all input genomes combined.
 * `skani_results.txt`: The raw all-vs-all comparison output from `skani`.
 * `ani_formatted.txt`: The reformatted `skani` output, ready for clustering.
-* **`catalog_clusters.tsv`**: The main clustering result. A tab-separated file with two columns: `representative` and `members` (a comma-separated list of all genome IDs in that cluster).
-* **`catalog_vOTU_catalog.fasta`**: The final, dereplicated genome catalog containing only the representative sequences for each vOTU.
+* `catalog_clusters.tsv`: A tab-separated file with two columns: `representative` and `members` (comma-separated list of IDs).
+* `catalog_vOTU_catalog.fasta`: The final dereplicated genome catalog containing only the representative sequences for each vOTU.
 
-This final FASTA file is your non-redundant set of genomes, ready for downstream analyses.
+---
+
+## 🔬 Clustering Methodology (Greedy Representative / Star Topology)
+
+The clustering algorithm is deterministic and avoids transitive chaining by using a greedy representative (star topology) strategy:
+
+1. Sort genomes by descending length (ties broken by ID).
+2. Select the longest unassigned genome as the cluster representative.
+3. Assign only genomes that directly meet ANI and coverage thresholds relative to that representative.
+4. Repeat until all genomes are assigned.
+
+This approach ensures cluster assignments are stable across runs and reflect direct similarity to the representative genome rather than indirect links through intermediate genomes.

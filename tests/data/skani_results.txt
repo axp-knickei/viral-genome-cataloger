@@ -1,0 +1,5 @@
+query	target	ani	qcov	tcov
+
+genome_a	genome_b	96.5	0.90	0.90
+
+genome_b	genome_c	96.0	0.90	0.90
