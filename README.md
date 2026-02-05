@@ -17,6 +17,14 @@ In viral metagenomics, researchers often recover thousands of sequences that may
 
 ---
 
+## 🔗 Upstream Processing
+
+This tool is specifically optimized to ingest viral genomes identified by the [Viral Discovery Pipeline (Viro-Flow)](https://www.google.com/search?q=URL_HERE). It takes the fragmented outputs of metagenomic assembly and discovery and organizes them into a scientifically rigorous reference catalog.
+
+For a detailed comparison and integration guide, see [INTEGRATION.md](INTEGRATION.md).
+
+---
+
 ## 🔬 Scientific Methodology
 
 ### 1. Species Demarcation (vOTUs)

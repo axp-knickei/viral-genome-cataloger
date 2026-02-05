@@ -29,6 +29,21 @@ graph TD
 
 ---
 
+## 🔄 Ecosystem Integration
+
+This tool operates as the "Librarian" in a larger viral discovery workflow, designed to ingest output from the **Viral Discovery Pipeline (Viro-Flow)** (the "Miner").
+
+### The "Miner" vs. "Librarian" Model
+*   **Viro-Flow (Miner)**: Extracts potential viral signals from raw metagenomic data. It prioritizes sensitivity but often produces redundant or fragmented assemblies across different samples.
+*   **Genome Cataloger (Librarian)**: Takes these fragmented discoveries and organizes them into a stable, non-redundant reference catalog using strict quality thresholds.
+
+### Abundance Normalization (TPM)
+While this cataloger focuses on dereplication, the ultimate goal of the ecosystem is accurate abundance profiling. By creating a non-redundant vOTU catalog, we ensure that:
+1.  **Read Mapping is Specific**: Reads map to a single representative rather than being split arbitrarily among identical duplicates.
+2.  **TPM Calculation is Accurate**: The upstream Viro-Flow pipeline uses **Transcripts Per Million (TPM)** to normalize abundance. This metric allows for valid cross-sample comparisons (e.g., "Virus A is more abundant in Sample 1 than Sample 2") which is only mathematically sound when the reference database is free of redundancy.
+
+---
+
 ## 🧬 Step 1: Genome Aggregation
 *   **Implementation**: Native Python `pathlib` and file I/O.
 *   **Process**: The pipeline scans the input directory for files with `.fa`, `.fna`, or `.fasta` extensions. These individual files are concatenated into a single master FASTA file (`all_genomes.fa`).
