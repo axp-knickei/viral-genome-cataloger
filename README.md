@@ -89,6 +89,24 @@ viral-cataloger \
   --min_tcov 85.0
 ```
 
+### HPC Job Submission (Slurm)
+For users on High-Performance Computing (HPC) clusters using Slurm, a helper utility `viral-cataloger-slurm` generates a submission script automatically:
+
+```bash
+viral-cataloger-slurm \
+  --job-name my_vOTU_job \
+  --time 02:00:00 \
+  --cpus-per-task 16 \
+  --mem 32G \
+  --input_dir ./my_genomes/ \
+  --output_dir ./vOTU_results/
+```
+
+This command creates a file `submit_cataloger.sbatch` which can be submitted via:
+```bash
+sbatch submit_cataloger.sbatch
+```
+
 ### Command-Line Arguments
 | Argument | Shorthand | Default | Description |
 | :--- | :--- | :--- | :--- |
